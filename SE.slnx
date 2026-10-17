@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SE.API/SE.API.csproj" />
+    <Project Path="src/SE.Application/SE.Application.csproj" />
+    <Project Path="src/SE.Domain/SE.Domain.csproj" />
+    <Project Path="src/SE.Infrastructure/SE.Infrastructure.csproj" />
+  </Folder>
+</Solution>
+
