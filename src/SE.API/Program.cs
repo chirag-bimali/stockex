@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using SE.API.Middlewares;
 using SE.Infrastructure.Persistence.Configurations;
 using SE.Infrastructure.Persistence.Seeding;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,17 +13,23 @@ var connectionString = builder.Configuration
         "Database connection string 'DefaultConnection' was not found.");
 
 builder.Services.AddControllers();
-builder.Services.AddInfrastructure(connectionString);
-builder.Services.AddSeeders();
 
 // Swagger services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddSeeders();
+builder.Services.AddApplication();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 
 
 
 var app = builder.Build();
+app.UseExceptionHandler();                               // safety net, keep it first
+
 
 
 using (var scope = app.Services.CreateScope())
@@ -33,7 +41,7 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync();
 }
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -41,6 +49,8 @@ if(app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+
 app.MapControllers();
 
 
