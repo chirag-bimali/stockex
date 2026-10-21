@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SE.Application.Abstractions.Persistence;
 using SE.Application.Abstractions.Security;
+using SE.Infrastructure.Persistence;
 using SE.Infrastructure.Persistence.Configurations;
 using SE.Infrastructure.Persistence.Repositories;
 using SE.Infrastructure.Security;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         );
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserRoleRepository, UserRoleRepository>();
