@@ -1,25 +1,33 @@
 using SE.Application.Abstractions.Messaging;
+using SE.Application.Abstractions.Persistence;
+using SE.Application.Abstractions.Security;
 using SE.Application.Common.Response;
+using SE.Domain.Entities;
 
 namespace SE.Application.Features.Authentication.Login;
 
-public class LoginHandler : ICommandHandler<LoginCommand, LoginResult>
+public class LoginHandler(
+    IUserRepository repository,
+    IJwtTokenService jwtTokenService,
+    IPasswordHasher passwordHasher
+) : ICommandHandler<LoginCommand, LoginResult>
 {
-    public LoginHandler()
-    {
-    }
-
     public async Task<Result<LoginResult>> Handle(LoginCommand command, CancellationToken ct)
     {
-        if (command.Email != "admin@se.com" || command.Password != "password")
+        var user = await repository.GetByEmailAsync(command.Email, ct);
+
+        if (user is null)
         {
-            var err = Error.UnauthorizedLogin("Auth.InvalidCredentials", "Invalid email or password.", new Dictionary<string, string[]>
-            {
-                { "Email", new[] { "Provided email is invalid" } },
-                { "Password", new[] { "Provided password is invalid" } }
-            });
-            return err;
+            return Error.Forbidden("auth.invalid_credentials", "Invalid email or password.");
         }
-        return new LoginResult("token", DateTime.UtcNow.AddHours(1));
+
+        if (passwordHasher.VerifyPassword(command.Password, user.PasswordHash) is false)
+        {
+            return Error.Forbidden("auth.invalid_credentials", "Invalid email or password.");
+        }
+
+        var generatedToken = jwtTokenService.GenerateAccessToken(user, user.UserRoles.Select(r => r.Role.Name));
+
+        return new LoginResult(generatedToken.Token, generatedToken.ExpiresAt);
     }
 }

@@ -8,10 +8,10 @@ public sealed class ApiResponse<T>
 {
   public bool Success { get; init; }
 
-  [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+  [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
   public T? Data { get; init; }
 
-  [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+  [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
   public ApiError? Error { get; init; }
 
   public static ApiResponse<T> Ok(T data) => new() { Success = true, Data = data };

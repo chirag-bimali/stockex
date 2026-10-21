@@ -33,6 +33,21 @@ public class User
     private User() { } // EF Core
 
     public User(
+        Guid id,
+        string email,
+        string passwordHash,
+        string firstName,
+        string lastName)
+    {
+        Id = id;
+        Email = email.Trim().ToLowerInvariant();
+        PasswordHash = passwordHash;
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
+    }
+
+
+    public User(
         string email,
         string passwordHash,
         string firstName,
