@@ -6,8 +6,11 @@ using SE.Domain.Entities;
 
 namespace SE.Application.Features.Authentication.Register;
 
-public class RegisterHandler(IUserRepository repository, IPasswordHasher passwordHasher)
-    : ICommandHandler<RegisterCommand, Guid>
+public class RegisterHandler(
+    IUserRepository repository,
+    IUnitOfWork unitOfWork,
+    IPasswordHasher passwordHasher
+) : ICommandHandler<RegisterCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(RegisterCommand command, CancellationToken ct)
     {
@@ -23,6 +26,7 @@ public class RegisterHandler(IUserRepository repository, IPasswordHasher passwor
         var newUser = new User(command.Email, hashedPassword, command.FirstName, command.LastName);
 
         await repository.AddAsync(newUser, ct);
+        await unitOfWork.SaveChangesAsync(ct);
 
         return newUser.Id;
     }
