@@ -1,4 +1,5 @@
 namespace SE.Domain.Entities;
+
 public class User
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
@@ -19,25 +20,17 @@ public class User
 
     public DateTimeOffset? LockedUntil { get; private set; }
 
-    public DateTimeOffset CreatedAt { get; private set; }
-        = DateTimeOffset.UtcNow;
+    public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public ICollection<UserRole> UserRoles { get; private set; }
-        = new List<UserRole>();
+    public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
 
-    public ICollection<RefreshToken> RefreshTokens { get; private set; }
-        = new List<RefreshToken>();
+    public ICollection<RefreshToken> RefreshTokens { get; private set; } = new List<RefreshToken>();
 
     private User() { } // EF Core
 
-    public User(
-        Guid id,
-        string email,
-        string passwordHash,
-        string firstName,
-        string lastName)
+    public User(Guid id, string email, string passwordHash, string firstName, string lastName)
     {
         Id = id;
         Email = email.Trim().ToLowerInvariant();
@@ -46,12 +39,7 @@ public class User
         LastName = lastName.Trim();
     }
 
-
-    public User(
-        string email,
-        string passwordHash,
-        string firstName,
-        string lastName)
+    public User(string email, string passwordHash, string firstName, string lastName)
     {
         Email = email.Trim().ToLowerInvariant();
         PasswordHash = passwordHash;
@@ -65,6 +53,14 @@ public class User
         UpdatedAt = DateTimeOffset.UtcNow;
         FailedLoginAttempts = 0;
         LockedUntil = null;
+    }
+
+    public void AssignRole(Role role)
+    {
+        if (UserRoles.Any(ur => ur.RoleId == role.Id))
+            return; // already has this role
+
+        UserRoles.Add(new UserRole(Id, role.Id));
     }
 
     public void VerifyEmail()
