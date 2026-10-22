@@ -6,7 +6,7 @@ using SE.Infrastructure.Persistence.Seeding;
 
 public class UserSeeder(AppDbContext db, IPasswordHasher passwordHasher) : ISeeder
 {
-    public int Order => 10;
+    public int Order => 1;
     public static readonly (
         Guid Id,
         string Email,

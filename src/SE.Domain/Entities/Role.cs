@@ -9,6 +9,8 @@ public class Role
     public string Description { get; private set; } = string.Empty;
 
     public ICollection<UserRole> UserRoles { get; private set; } = new List<UserRole>();
+    public ICollection<RolePermission> RolePermissions { get; private set; } =
+        new List<RolePermission>();
 
     private Role() { } // EF Core
 

@@ -8,7 +8,7 @@ using SE.Infrastructure.Persistence.Seeding;
 
 public class UserRoleSeeder(AppDbContext db) : ISeeder
 {
-    public int Order => 20;
+    public int Order => 2;
     public static readonly (Guid UserId, int RoleId)[] UserRoles =
     [
         (Guid.Parse("00000000-0000-0000-0000-000000000001"), 1),
