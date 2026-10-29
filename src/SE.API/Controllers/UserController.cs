@@ -3,14 +3,28 @@ using SE.API.Controllers;
 using SE.Application.Abstractions.Messaging;
 using SE.Application.Common.Response;
 using SE.Application.Features.Users.CreateUser;
+using SE.Application.Features.Users.GetAllUser;
 using SE.Application.Features.Users.GetCurrentUser;
 
 [ApiController]
 public class UserController(
     ICommandHandler<CreateUserCommand, Guid> createUser,
+    IQueryHandler<GetAllUserQuery, GetAllUserResult> getAllUsers,
     IQueryHandler<GetCurrentUserQuery, GetCurrentUserResult> getCurrentUser
 ) : ApiControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        CancellationToken ct = default
+    )
+    {
+        return FromResult(
+            await getAllUsers.Handle(new GetAllUserQuery(pageNumber, pageSize), ct)
+        );
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(CreateUserCommand command, CancellationToken ct)
     {

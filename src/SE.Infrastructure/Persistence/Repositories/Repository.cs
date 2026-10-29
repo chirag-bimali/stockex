@@ -15,6 +15,17 @@ public class Repository<T>(AppDbContext db) : IRepository<T>
     public async Task<List<T>> GetAllAsync(CancellationToken ct) =>
         await Db.Set<T>().ToListAsync(ct);
 
+    public async Task<List<T>> GetAllAsync(int pageNumber, int pageSize, CancellationToken ct)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
+
+        return await Db.Set<T>()
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+    }
+
     public async Task AddAsync(T entity, CancellationToken ct) =>
         await Db.Set<T>().AddAsync(entity, ct);
 
