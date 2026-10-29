@@ -10,6 +10,15 @@ public sealed class PermissionService(AppDbContext db, IMemoryCache cache) : IPe
 {
     public async Task<bool> HasPermissionAsync(Guid userId, string permission, CancellationToken ct)
     {
+        var permissions = await GetPermissionsAsync(userId, ct);
+        return permissions.Contains(permission);
+    }
+
+    public async Task<IReadOnlyCollection<string>> GetPermissionsAsync(
+        Guid userId,
+        CancellationToken ct
+    )
+    {
         var permissions = await cache.GetOrCreateAsync(
             $"permissions:{userId}",
             async entry =>
@@ -24,10 +33,11 @@ public sealed class PermissionService(AppDbContext db, IMemoryCache cache) : IPe
                     select p.Name
                 )
                     .Distinct()
+                    .OrderBy(name => name)
                     .ToListAsync(ct);
             }
         );
 
-        return permissions!.Contains(permission);
+        return permissions ?? [];
     }
 }

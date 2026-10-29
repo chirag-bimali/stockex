@@ -5,7 +5,7 @@ using SE.Application.Abstractions.Security;
 using SE.Application.Common.Response;
 using SE.Application.Common.Security;
 
-internal sealed class AuthorizationDecorator<TCommand, TResponse>(
+internal sealed class AuthorizationCommandDecorator<TCommand, TResponse>(
     ICommandHandler<TCommand, TResponse> inner,
     IPermissionService permissionService,
     ICurrentUser currentUser
@@ -18,17 +18,6 @@ internal sealed class AuthorizationDecorator<TCommand, TResponse>(
 
     public async Task<Result<TResponse>> Handle(TCommand command, CancellationToken ct)
     {
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine($"AuthorizationDecorator: Handling command of type {typeof(TCommand).Name}");
-        Console.WriteLine($"Required permissions: {string.Join(", ", Required)}");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
-        Console.WriteLine("----------------------------------------------");
         if (Required.Length == 0)
             return await inner.Handle(command, ct);
 

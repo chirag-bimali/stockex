@@ -2,14 +2,15 @@ using FluentValidation;
 using SE.Application.Abstractions.Messaging;
 using SE.Application.Common.Response;
 
-public class ValidationDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult>
+public class ValidationCommandDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult>
 {
     private readonly ICommandHandler<TCommand, TResult> _inner;
     private readonly IEnumerable<IValidator<TCommand>> _validators;
 
-    public ValidationDecorator(
+    public ValidationCommandDecorator(
         ICommandHandler<TCommand, TResult> inner,
-        IEnumerable<IValidator<TCommand>> validators)
+        IEnumerable<IValidator<TCommand>> validators
+    )
     {
         _inner = inner;
         _validators = validators;
@@ -26,15 +27,14 @@ public class ValidationDecorator<TCommand, TResult> : ICommandHandler<TCommand, 
             if (failures.Count != 0)
             {
                 var details = failures
-                .GroupBy(f => f.PropertyName)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(f => f.ErrorMessage).ToArray());
+                    .GroupBy(f => f.PropertyName)
+                    .ToDictionary(g => g.Key, g => g.Select(f => f.ErrorMessage).ToArray());
 
                 return Error.Validation(
                     "Validation.Failed",
                     "One or more validation errors occurred.",
-                    details);
+                    details
+                );
             }
         }
 

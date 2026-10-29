@@ -32,7 +32,12 @@ public sealed class PermissionSeeder(AppDbContext db) : ISeeder
                     adminRoles.RolePermissions.All(rp => rp.PermissionId != p.Id)
                 )
             )
+            {
+                if (p.Name == Permissions.Trader.Access)
+                    continue;
+
                 adminRoles.RolePermissions.Add(new RolePermission(adminRoles.Id, p.Id));
+            }
 
             await db.SaveChangesAsync(ct);
         }

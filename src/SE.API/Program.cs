@@ -4,10 +4,13 @@ using System.Text;
 using Application.Abstractions.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using SE.API.Common.Response;
 using SE.API.Middlewares;
 using SE.API.Services;
+using SE.Application.Common.Response;
 using SE.Infrastructure.Persistence.Configurations;
 using SE.Infrastructure.Persistence.Seeding;
 
@@ -58,7 +61,30 @@ var connectionString =
         "Database connection string 'DefaultConnection' was not found."
     );
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var details = context.ModelState
+                .Where(entry => entry.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage)
+                            ? error.Exception?.Message ?? "The value is invalid."
+                            : error.ErrorMessage)
+                        .ToArray());
+
+            var error = Error.Validation(
+                "Validation.Failed",
+                "One or more validation errors occurred.",
+                details);
+
+            return new BadRequestObjectResult(ApiResponse<object>.Fail(error));
+        };
+    });
 
 // Swagger services
 builder.Services.AddEndpointsApiExplorer();
@@ -93,6 +119,15 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 var app = builder.Build();
 app.UseExceptionHandler(); // safety net, keep it first
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 

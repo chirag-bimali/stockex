@@ -17,4 +17,14 @@ public static class Permissions
         public const string Create = "users.create";
         public const string Read = "users.read";
     }
+
+    public static class Admin
+    {
+        public const string Access = "admin.access";
+    }
+
+    public static class Trader
+    {
+        public const string Access = "trader.access";
+    }
 }

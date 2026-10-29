@@ -9,7 +9,8 @@ namespace SE.Application.Features.Authentication.Register;
 public class RegisterHandler(
     IUserRepository repository,
     IUnitOfWork unitOfWork,
-    IPasswordHasher passwordHasher
+    IPasswordHasher passwordHasher,
+    IRoleRepository roleRepository
 ) : ICommandHandler<RegisterCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(RegisterCommand command, CancellationToken ct)
@@ -24,6 +25,10 @@ public class RegisterHandler(
         var hashedPassword = passwordHasher.HashPassword(command.Password);
 
         var newUser = new User(command.Email, hashedPassword, command.FirstName, command.LastName);
+        newUser.AssignRole(
+            await roleRepository.GetByNameAsync("Trader", ct)
+                ?? throw new Exception("Default role not found.")
+        );
 
         await repository.AddAsync(newUser, ct);
         await unitOfWork.SaveChangesAsync(ct);

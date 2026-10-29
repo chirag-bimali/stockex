@@ -6,7 +6,6 @@ using SE.Application.Features.Authentication.Login;
 using SE.Application.Features.Authentication.Register;
 
 [ApiController]
-[Route("auth")]
 public class AuthController : ApiControllerBase
 {
     private readonly ICommandHandler<LoginCommand, LoginResult> _login;
@@ -21,7 +20,7 @@ public class AuthController : ApiControllerBase
         _register = register;
     }
 
-    [HttpPost("login")]
+    [HttpPost("signin")]
     public async Task<IActionResult> Login(LoginCommand command, CancellationToken ct)
     {
         var result = await _login.Handle(command, ct);

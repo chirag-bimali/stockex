@@ -14,19 +14,22 @@ public class LoginHandler(
 {
     public async Task<Result<LoginResult>> Handle(LoginCommand command, CancellationToken ct)
     {
-        var user = await repository.GetByEmailAsync(command.Email, ct);
+        var user = await repository.GetByEmailAsync(command.Email.Trim().ToLower(), ct);
 
         if (user is null)
         {
-            return Error.Forbidden("auth.invalid_credentials", "Invalid email or password.");
+            return Error.Unauthorized("auth.invalid_credentials", "Invalid email or password.");
         }
 
         if (passwordHasher.VerifyPassword(command.Password, user.PasswordHash) is false)
         {
-            return Error.Forbidden("auth.invalid_credentials", "Invalid email or password.");
+            return Error.Unauthorized("auth.invalid_credentials", "Invalid email or password.");
         }
 
-        var generatedToken = jwtTokenService.GenerateAccessToken(user, user.UserRoles.Select(r => r.Role.Name));
+        var generatedToken = jwtTokenService.GenerateAccessToken(
+            user,
+            user.UserRoles.Select(r => r.Role.Name)
+        );
 
         return new LoginResult(generatedToken.Token, generatedToken.ExpiresAt);
     }
