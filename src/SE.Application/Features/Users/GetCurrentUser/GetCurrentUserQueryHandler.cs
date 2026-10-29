@@ -45,6 +45,13 @@ public class GetCurrentUserQueryHandler(
 
         var permissions = await permissionService.GetPermissionsAsync(userId, ct);
 
-        return new GetCurrentUserResult(user.Id, user.Email, roles, permissions);
+        return new GetCurrentUserResult(
+            user.Id,
+            user.Email,
+            user.FirstName,
+            user.LastName,
+            roles,
+            permissions
+        );
     }
 }

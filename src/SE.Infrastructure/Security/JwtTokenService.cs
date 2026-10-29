@@ -20,6 +20,8 @@ public sealed class JwtTokenService(IConfiguration configuration) : IJwtTokenSer
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email),
+            new("given_name", user.FirstName),
+            new("family_name", user.LastName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 

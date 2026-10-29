@@ -18,11 +18,15 @@ public class GetAllQueryHandler : IQueryHandler<GetAllUserQuery, GetAllUserResul
         CancellationToken cancellationToken
     )
     {
-        var users = await _userRepository.GetAllAsync(
+        var (users, totalCount) = await _userRepository.GetPagedAsync(
             query.PageNumber,
             query.PageSize,
+            query.Search,
+            query.Role,
+            query.IsActive,
+            query.IsEmailVerified,
             cancellationToken
         );
-        return new GetAllUserResult(users);
+        return new GetAllUserResult(users, query.PageNumber, query.PageSize, totalCount);
     }
 }

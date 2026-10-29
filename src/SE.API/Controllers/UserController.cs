@@ -17,11 +17,25 @@ public class UserController(
     public async Task<IActionResult> GetAll(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] string? role = null,
+        [FromQuery] bool? isActive = null,
+        [FromQuery] bool? isEmailVerified = null,
         CancellationToken ct = default
     )
     {
         return FromResult(
-            await getAllUsers.Handle(new GetAllUserQuery(pageNumber, pageSize), ct)
+            await getAllUsers.Handle(
+                new GetAllUserQuery(
+                    pageNumber,
+                    pageSize,
+                    search,
+                    role,
+                    isActive,
+                    isEmailVerified
+                ),
+                ct
+            )
         );
     }
 
